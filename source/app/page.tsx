@@ -136,9 +136,9 @@ export default function Home() {
           </div>}
           <article className="selected-zone">
             <div className="selected-zone-head">
-              <strong>{zone.label}<small>色區</small></strong>
-              <div><span>身長區間</span><b>{zone.minCm}–{zone.maxCm} cm</b></div>
-              <div><span>色帶體重</span><b>{zone.minKg}–{zone.maxKg} kg</b></div>
+              <strong>{outsideColorRange ? "超界" : zone.label}<small>色區</small></strong>
+              <div><span>身長區間</span><b>{outsideColorRange ? "不適用" : `${zone.minCm}–${zone.maxCm} cm`}</b></div>
+              <div><span>色帶體重</span><b>{outsideColorRange ? "超出 3–36 kg" : `${zone.minKg}–${zone.maxKg} kg`}</b></div>
             </div>
             <div className="selected-zone-data">
               <div><span>計算用體重</span><b>{workingWeight.toFixed(1)}</b><small>kg</small></div>
@@ -154,7 +154,7 @@ export default function Home() {
           <div className="tape-note"><b>{mode === "bestGuess" ? "Best Guess 注意：" : "讀法："}</b>{mode === "bestGuess" ? "年齡公式僅供緊急備援估重，個體、族群與體型差異可造成誤差；新生兒、肥胖兒或體型明顯異常者尤其須謹慎。能量測時以實測體重或身長式工具優先。" : "仰躺、頭頂對齊尺端，沿身體拉到足跟讀取色區。色帶與器材尺寸只供初始估算，須依器材標示複核。"}</div>
         </section>
         <aside className="vitals-panel">
-          <div className="section-title"><span>02</span><div><b>小兒尺對應速查</b><small>目前 {zone.label}色區｜計算用體重 {workingWeight.toFixed(1)} kg</small></div></div>
+          <div className="section-title"><span>02</span><div><b>小兒尺對應速查</b><small>目前 {outsideColorRange ? "超出尺範圍" : zone.label + "色區"}｜計算用體重 {workingWeight.toFixed(1)} kg</small></div></div>
           <div className="mobile-weight-link"><b>{zone.label}色 · {workingWeight.toFixed(1)} kg</b><span>選擇實際年齡層後，下方數值會依目前體重計算</span></div>
           <div className="age-tabs">{(Object.keys(vitals) as VitalKey[]).map((key) => <button key={key} className={vitalKey === key ? "active" : ""} onClick={() => selectVital(key)}><b>{vitals[key].label}</b><small>{vitals[key].age}</small></button>)}</div>
           <div className="vital-focus"><div className="focus-age"><span>{selectedVital.label}</span><b>{selectedVital.age}</b></div><div><span>心率</span><b>{selectedVital.heart}</b><small>bpm</small></div><div><span>呼吸率</span><b>{selectedVital.breathing}</b><small>次／分</small></div><div className="pressure"><span>正常血壓平均值</span><b>{selectedVital.pressure}</b><small>低血壓警戒：{selectedVital.lowPressure} mmHg</small></div><div className="tidal"><span>潮氣量參考</span><b>{selectedVital.tidalMin}–{selectedVital.tidalMax} mL/kg</b><small>{tidalMl}｜{selectedVital.tidalNote}</small></div></div>
