@@ -52,6 +52,8 @@ const apgarTimes: ApgarTime[] = [1, 5, 10, 15, 20];
 const blankApgar = (): ApgarScores => ({ appearance: null, pulse: null, grimace: null, activity: null, respiration: null });
 
 export default function Home() {
+  const [confirmedNeonatalDays, setConfirmedNeonatalDays] = useState(false);
+  const [confirmedPuberty, setConfirmedPuberty] = useState(false);
   const [mode, setMode] = useState<InputMode>("length");
   const [length, setLength] = useState(92);
   const [weight, setWeight] = useState(14);
@@ -69,7 +71,8 @@ export default function Home() {
   const workingWeight = mode === "length" ? zone.estimate : activeWeight;
   const outsideColorRange = workingWeight < 3 || workingWeight > 36;
   const selectedVital = vitals[vitalKey];
-  const selectedRule50 = rule50[vitalKey];
+  const glucoseAgeConfirmed = (vitalKey !== "newborn" || confirmedNeonatalDays) && (vitalKey !== "teen" || confirmedPuberty);
+  const selectedRule50 = glucoseAgeConfirmed ? rule50[vitalKey] : {...rule50[vitalKey], mlKg: null, solution: "先確認年齡條件"};
   const tidalMl = `${Number((workingWeight * selectedVital.tidalMin).toFixed(1))}–${Number((workingWeight * selectedVital.tidalMax).toFixed(1))} mL`;
   const rule50Ml = selectedRule50.mlKg === null ? "勿自行外推" : `${Number((workingWeight * selectedRule50.mlKg).toFixed(1))} mL`;
   const midazolam = workingWeight > 40
@@ -176,7 +179,7 @@ export default function Home() {
             <a href="https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2015/10/the-apgar-score" target="_blank" rel="noreferrer">AAP／ACOG APGAR 指引 ↗</a>
           </section>}
           <div className="rule50-card">
-            <div className="rule50-title"><b>RULE 50</b><span>低血糖處置速查</span></div>
+            <div className="rule50-title"><b>RULE 50</b><span>低血糖處置速查</span></div>{vitalKey === "newborn" && <label><input type="checkbox" checked={confirmedNeonatalDays} onChange={e => setConfirmedNeonatalDays(e.target.checked)} />已確認出生未滿28日及本場採用方案</label>}{vitalKey === "teen" && <label><input type="checkbox" checked={confirmedPuberty} onChange={e => setConfirmedPuberty(e.target.checked)} />已確認符合教材青春期條件及地方SOP（不能只依大於10歲）</label>}
             <div className="rule50-main"><span>{selectedRule50.threshold}</span><b>{selectedRule50.solution}{selectedRule50.mlKg === null ? "" : ` · ${selectedRule50.mlKg} mL/kg`}</b><strong>{rule50Ml}</strong></div>
             <p>{selectedRule50.note}｜只顯示目前年齡對應方案；4 歲至青春期前未列示時不自行外推｜依救護層級、醫療指導與地方 SOP 執行</p>
           </div>
